@@ -60,6 +60,14 @@ All methods return promises.
 * getMyOrder(params = {})
 * getMyTradesByOrder(params = {})
 * getAllMyTrades(params = {})
+* getPaymentBalance(params = {})
+* getPaymentAddress(params = {})
+* createPaymentAddress(params = {})
+* getAllPaymentTransactions(params = {})
+* getPaymentTransaction(params = {})
+* transferToTraging(params = {})
+* transferToMain(params = {})
+* withdrawToAddress(params = {})
 
 ### WebSocket
 * addMarketMessageListener(listener)
