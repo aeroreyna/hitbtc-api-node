@@ -69,14 +69,14 @@ export default class HitBTC {
       ...params,
     })
 
-  requestTrading = (endpoint, method, params = {}) => {
+  requestPrivate = (endpoint, method, params = {}) => {
     if (!this.key || !this.secret) {
       throw new Error(
         `API key and secret key required to use authenticated methods`,
       );
     }
 
-    const path = `/api/1/trading${endpoint}`;
+    const path = `/api/1${endpoint}`;
 
     // All requests include these
     const authParams = {
@@ -123,46 +123,77 @@ export default class HitBTC {
   }
 
   getMyBalance = () =>
-    this.requestTrading(`/balance`, `get`, {})
+    this.requestPrivate(`/trading/balance`, `get`, {})
       .then(formatBalanceData);
 
   getMyActiveOrders = (params = {}) =>
-    this.requestTrading(`/orders/active`, `get`, params);
+    this.requestPrivate(`/trading/orders/active`, `get`, params);
 
   placeOrder = (params = {}) =>
-    this.requestTrading(`/new_order`, `post`, {
+    this.requestPrivate(`/trading/new_order`, `post`, {
       clientOrderId: shortid(),
       ...params,
     });
 
   cancelOrder = (params = {}) =>
-    this.requestTrading(`/cancel_order`, `post`, {
+    this.requestPrivate(`/trading/cancel_order`, `post`, {
       cancelRequestClientOrderId: shortid(),
       ...params,
     });
 
   cancelAllOrders = (params = {}) =>
-    this.requestTrading(`/cancel_orders`, `post`, params);
+    this.requestPrivate(`/trading/cancel_orders`, `post`, params);
 
   getMyRecentOrders = (params = {}) =>
-    this.requestTrading(`/orders/recent`, `get`, {
+    this.requestPrivate(`/trading/orders/recent`, `get`, {
       max_results: 100,
       sort: `desc`,
       ...params,
     });
 
   getMyOrder = (params = {}) =>
-    this.requestTrading(`/order`, `get`, params);
+    this.requestPrivate(`/trading/order`, `get`, params);
 
   getMyTradesByOrder = (params = {}) =>
-    this.requestTrading(`/trades/by/order`, `get`, params);
+    this.requestPrivate(`/trading/trades/by/order`, `get`, params);
 
   getAllMyTrades = (params = {}) =>
-    this.requestTrading(`/trades`, `get`, {
+    this.requestPrivate(`/trading/trades`, `get`, {
       by: `trade_id`,
       max_results: 100,
       start_index: 0,
       sort: `desc`,
       ...params,
     });
+
+  getPaymentBalance = (params = {}) =>
+    this.requestPrivate(`/payment/balance`, `get`, params);
+
+  getPaymentAddress = (params = {}) =>
+    this.requestPrivate(`/payment/address/${params.currency}`, `get`, params);
+
+  createPaymentAddress = (params = {}) =>
+    this.requestPrivate(`/payment/address/${params.currency}`, `post`, params);
+
+  getAllPaymentTransactions = (params = {}) =>
+    this.requestPrivate(`/payment/transactions`, `get`, {
+      limit: 100,
+      ...params
+    });
+
+  getPaymentTransaction = (params = {}) =>
+    this.requestPrivate(`/payment/transactions/${params.id}`, `get`, params);
+
+  transferToTraging = (params = {}) =>
+    this.requestPrivate(`/payment/transfer_to_trading`, `post`, params);
+    // Required: amount & currency_code
+
+  transferToMain = (params = {}) =>
+    this.requestPrivate(`/payment/transfer_to_main`, `post`, params);
+    // Required: amount & currency_code
+
+  withdrawToAddress = (params = {}) =>
+    this.requestPrivate(`/payment/payout`, `post`, params);
+    // Required: amount & currency_code & address
+
 }

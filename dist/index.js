@@ -51,6 +51,7 @@ const formatBalanceData = (0, _mapValues2.default)((0, _keyBy2.default)((0, _get
 const uri = (path, params) => `${path}?${(0, _qs.stringify)(params)}`;
 
 class HitBTC {
+  // Required: amount & currency_code & address
 
   constructor({ key, secret, isDemo = false } = { isDemo: false }) {
     this.requestPublic = (endpoint, params = {}) => _axios2.default.get(`${this.url}/public${endpoint}`, { params }).then((0, _get2.default)(`data`)).catch((0, _get2.default)(`response.data`));
@@ -79,12 +80,12 @@ class HitBTC {
       format_item: `object`
     }, params));
 
-    this.requestTrading = (endpoint, method, params = {}) => {
+    this.requestPrivate = (endpoint, method, params = {}) => {
       if (!this.key || !this.secret) {
         throw new Error(`API key and secret key required to use authenticated methods`);
       }
 
-      const path = `/api/1/trading${endpoint}`;
+      const path = `/api/1${endpoint}`;
 
       // All requests include these
       const authParams = {
@@ -115,35 +116,53 @@ class HitBTC {
       return _axios2.default[method](requestUrl, ...args).then((0, _get2.default)(`data`)).catch((0, _get2.default)(`response.data`));
     };
 
-    this.getMyBalance = () => this.requestTrading(`/balance`, `get`, {}).then(formatBalanceData);
+    this.getMyBalance = () => this.requestPrivate(`/trading/balance`, `get`, {}).then(formatBalanceData);
 
-    this.getMyActiveOrders = (params = {}) => this.requestTrading(`/orders/active`, `get`, params);
+    this.getMyActiveOrders = (params = {}) => this.requestPrivate(`/trading/orders/active`, `get`, params);
 
-    this.placeOrder = (params = {}) => this.requestTrading(`/new_order`, `post`, _extends({
+    this.placeOrder = (params = {}) => this.requestPrivate(`/trading/new_order`, `post`, _extends({
       clientOrderId: (0, _shortid2.default)()
     }, params));
 
-    this.cancelOrder = (params = {}) => this.requestTrading(`/cancel_order`, `post`, _extends({
+    this.cancelOrder = (params = {}) => this.requestPrivate(`/trading/cancel_order`, `post`, _extends({
       cancelRequestClientOrderId: (0, _shortid2.default)()
     }, params));
 
-    this.cancelAllOrders = (params = {}) => this.requestTrading(`/cancel_orders`, `post`, params);
+    this.cancelAllOrders = (params = {}) => this.requestPrivate(`/trading/cancel_orders`, `post`, params);
 
-    this.getMyRecentOrders = (params = {}) => this.requestTrading(`/orders/recent`, `get`, _extends({
+    this.getMyRecentOrders = (params = {}) => this.requestPrivate(`/trading/orders/recent`, `get`, _extends({
       max_results: 100,
       sort: `desc`
     }, params));
 
-    this.getMyOrder = (params = {}) => this.requestTrading(`/order`, `get`, params);
+    this.getMyOrder = (params = {}) => this.requestPrivate(`/trading/order`, `get`, params);
 
-    this.getMyTradesByOrder = (params = {}) => this.requestTrading(`/trades/by/order`, `get`, params);
+    this.getMyTradesByOrder = (params = {}) => this.requestPrivate(`/trading/trades/by/order`, `get`, params);
 
-    this.getAllMyTrades = (params = {}) => this.requestTrading(`/trades`, `get`, _extends({
+    this.getAllMyTrades = (params = {}) => this.requestPrivate(`/trading/trades`, `get`, _extends({
       by: `trade_id`,
       max_results: 100,
       start_index: 0,
       sort: `desc`
     }, params));
+
+    this.getPaymentBalance = (params = {}) => this.requestPrivate(`/payment/balance`, `get`, params);
+
+    this.getPaymentAddress = (params = {}) => this.requestPrivate(`/payment/address/${params.currency}`, `get`, params);
+
+    this.createPaymentAddress = (params = {}) => this.requestPrivate(`/payment/address/${params.currency}`, `post`, params);
+
+    this.getAllPaymentTransactions = (params = {}) => this.requestPrivate(`/payment/transactions`, `get`, _extends({
+      limit: 100
+    }, params));
+
+    this.getPaymentTransaction = (params = {}) => this.requestPrivate(`/payment/transactions/${params.id}`, `get`, params);
+
+    this.transferToTraging = (params = {}) => this.requestPrivate(`/payment/transfer_to_trading`, `post`, params);
+
+    this.transferToMain = (params = {}) => this.requestPrivate(`/payment/transfer_to_main`, `post`, params);
+
+    this.withdrawToAddress = (params = {}) => this.requestPrivate(`/payment/payout`, `post`, params);
 
     this.key = key;
     this.secret = secret;
@@ -151,6 +170,9 @@ class HitBTC {
     this.baseUrl = `http://${subdomain}.hitbtc.com`;
     this.url = `${this.baseUrl}/api/1`;
   }
+  // Required: amount & currency_code
+
+  // Required: amount & currency_code
 
 }
 exports.default = HitBTC;
